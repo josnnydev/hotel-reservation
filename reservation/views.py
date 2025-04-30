@@ -6,29 +6,48 @@ from rest_framework import status
 from .models import Hotel, Room, Reservation, Bus
 from .serializers import HotelSerializer, RoomSerializer, ReservationSerializer
 from django.shortcuts import get_object_or_404
-from rest_framework import generics
-from django.contrib.auth.models import User
+ 
 from .serializers import RegisterSerializer
 from rest_framework.permissions import AllowAny
+from django.shortcuts import render 
+from rest_framework.authtoken.models import Token
+
+
+
+def Index(request):
+    return render(request, 'index.html')
+def SignIn(request):
+    return render(request, 'signin.html')
+
+def Register(request):
+    return render(request,'register.html')     
+
+    
  
  
  
 
 
 # Create your views here.
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
+class RegisterAndRedirect(APIView):
     permission_classes = [AllowAny]
-
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                'message': 'User registered successfully',
+                'token': token.key
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
 
 class HotelApiView(APIView):
     permission_classes = [IsAdminUser]
 
     def get(self, request):
-        user = request.user
-        hotel = Hotel.objects.filter(user=user).first()
+        hotel = Hotel.objects.first()
         
         serializer = HotelSerializer(hotel)
         return Response(serializer.data)
@@ -38,8 +57,7 @@ class RoomEnable(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-        rooms = Room.objects.filter(enable=True, user=user)
+        rooms = Room.objects.filter(enable=True)
         serializer = RoomSerializer(rooms, many=True)
         return Response(serializer.data)
 
@@ -50,20 +68,21 @@ class  CreateReservation(APIView):
         user = request.user
         data = request.data
          
-        room = get_object_or_404(Room, id=data['room_id'], user=user)
-        bus = get_object_or_404(Bus, id=data['bus_id'], user=user)
+        room = get_object_or_404(Room, id=data['room_id'])
+        bus = get_object_or_404(Bus, id=data['bus_id'])
+        hotel = get_object_or_404(Hotel, id=data['hotel_id'])
 
         check_in = data['check_in']
         check_out = data['check_out']
-        price =  data['price']
+        price =  room.price_room + bus.price_bus
         if not check_in or not check_out:
             return Response({'error': 'check_in and check_out are required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        Reservation.objects.create(  room=room, bus=bus, check_in=check_in, check_out=check_out, price=price, user=user)
+        Reservation.objects.create( hotel=hotel, room=room, bus=bus, check_in=check_in, check_out=check_out, price=price, user=user)
          
         room.enable = False
         room.save() 
-        return Response({'message': 'Room disabled successfully', 'room': room.type_room, 'bus': bus.name, 'total': price, 'check_in': check_in, 'check_out': check_out}, status=status.HTTP_200_OK)
+        return Response({'message': 'Room disabled successfully', 'hotel': hotel.name, 'room': room.type_room, 'bus': bus.name, 'total': price, 'check_in': check_in, 'check_out': check_out}, status=status.HTTP_200_OK)
 
 class ListClientsInfo(APIView):
     permission_classes = [IsAuthenticated]

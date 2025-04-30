@@ -8,7 +8,7 @@ class Hotel(models.Model):
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=255)
     telephone = models.CharField(max_length=15)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+   
 
     def __str__(self):
         return self.name
@@ -18,7 +18,7 @@ class Room(models.Model):
     type_room = models.CharField(max_length=100)
     price_room = models.DecimalField(max_digits=10, decimal_places=2)
     enable = models.BooleanField(default=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
 
     def __str__(self):
         return f'{self.type_room} - {self.price_room} - {self.enable}'
@@ -27,7 +27,7 @@ class Bus(models.Model):
     name = models.CharField(max_length=100)
     capacity = models.IntegerField()
     price_bus = models.DecimalField(max_digits=10, decimal_places=2)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
 
     def __str__(self):
         return self.name
