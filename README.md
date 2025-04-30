@@ -18,5 +18,5 @@ Esta API permite gestionar reservas de habitaciones y traslados en autobús para
 1. Clona este repositorio:
 
 ```bash
-git clone https://github.com/tu-usuario/hotel-api.git
-cd hotel-api
+git clone https://github.com/josnnydev/hotel-reservation.git
+cd hotel-reservation
