@@ -2,11 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
- 
 from .models import Hotel, Room, Reservation, Bus
 from .serializers import HotelSerializer, RoomSerializer, ReservationSerializer, BusSerializer
-from django.shortcuts import get_object_or_404
- 
+from django.shortcuts import get_object_or_404 
 from .serializers import RegisterSerializer
 from rest_framework.permissions import AllowAny
 from django.shortcuts import render 
@@ -14,13 +12,12 @@ from rest_framework.authtoken.models import Token
 
 
 
-def Index(request):
-    return render(request, 'index.html')
+ 
     
 
     
  
- 
+#api get que hace llamada a la base de datos y devuelve los hoteles, habitaciones y buses
 class getHotelsRoomsBuses(APIView):
     
     permission_classes = [IsAdminUser, IsAuthenticated]
@@ -37,7 +34,7 @@ class getHotelsRoomsBuses(APIView):
         })
 
 
-# Create your views here.
+#api post que recibe los datos del registro de un nuevo usuario y devuelve un token
 class RegisterAndRedirect(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
@@ -51,7 +48,7 @@ class RegisterAndRedirect(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
-
+#api get que devuelve la información del hotel
 class HotelApiView(APIView):
     permission_classes = [IsAdminUser]
 
@@ -61,7 +58,7 @@ class HotelApiView(APIView):
         serializer = HotelSerializer(hotel)
         return Response(serializer.data)
 
-
+#api get que devuelve la información de las habitaciones habilitadas
 class RoomEnable(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -69,7 +66,8 @@ class RoomEnable(APIView):
         rooms = Room.objects.filter(enable=True)
         serializer = RoomSerializer(rooms, many=True)
         return Response(serializer.data)
-
+    
+#api post que recibe los datos de la reserva y crea una nueva reserva
 class CreateReservation(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -77,10 +75,10 @@ class CreateReservation(APIView):
         user = request.user
         data = request.data
         
-        # Ajusta las claves según los datos que estás enviando desde el frontend
-        room = get_object_or_404(Room, id=data['type_room'])  # Cambié 'type_room' por 'id'
-        bus = get_object_or_404(Bus, id=data['name'])  # Cambié 'name' por 'id'
-        hotel = get_object_or_404(Hotel, id=data['hotel'])  # Cambié 'hotel' por 'id'
+        
+        room = get_object_or_404(Room, id=data['type_room'])   
+        bus = get_object_or_404(Bus, id=data['name'])   
+        hotel = get_object_or_404(Hotel, id=data['hotel'])   
 
         check_in = data['check_in']
         check_out = data['check_out']
@@ -112,7 +110,7 @@ class CreateReservation(APIView):
             'check_out': check_out
         }, status=status.HTTP_200_OK)
 
-
+#api get que devuelve la información de las reservas del usuario
 class ListClientsInfo(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -131,6 +129,7 @@ class ListClientsInfo(APIView):
         ]
         return Response(data)
 
+#api post que recibe los datos de la reserva y elimina la reserva
 class Checkout(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -143,7 +142,7 @@ class Checkout(APIView):
         reservation.delete()
         return Response({'message': 'Room enabled successfully'}, status=status.HTTP_200_OK)        
     
-
+#api post que recibe los datos de la reserva y devuelve la información de las reservas del usuario
 class ReservationClientBus(APIView):
     permission_classes = [IsAuthenticated]
 

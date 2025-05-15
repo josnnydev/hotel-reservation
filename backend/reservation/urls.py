@@ -1,7 +1,5 @@
- 
- 
 from django.urls import path
-from .views import HotelApiView, RoomEnable, CreateReservation, ListClientsInfo, Checkout, ReservationClientBus,  Index, RegisterAndRedirect, getHotelsRoomsBuses
+from .views import HotelApiView, RoomEnable, CreateReservation, ListClientsInfo, Checkout, ReservationClientBus,   RegisterAndRedirect, getHotelsRoomsBuses
 from django.conf import settings
 from django.conf.urls.static import static
     
@@ -18,7 +16,7 @@ urlpatterns = [
     path('get-hotels-rooms-buses/', getHotelsRoomsBuses.as_view()),
 
 
-    path('', Index, name='index'),
+    
     
     
 ]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
