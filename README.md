@@ -28,7 +28,7 @@ cd hotel-reservation
 ```
 ---
 ## Otra info
-- Puedes al clonar el repo puedes ver las rutas de la api en: 
+- Al clonar el repo puedes ver las rutas de la api en: 
 http://127.0.0.1:8000/swagger/
 
 
